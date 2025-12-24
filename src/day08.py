@@ -1,5 +1,6 @@
 from pathlib import Path
 from helpers import read_lines 
+import math
 
 INPUT_PATH = Path(__file__).with_suffix(".txt")
 
@@ -7,15 +8,100 @@ def parse(lines: list[str]):
     """Turn raw input lines into a useful data structure."""
     return [tuple(map(int, l.split(","))) for l in lines]
 
-
 def part1(num_connect, data) -> int:
-    print(f"Num to connect: {num_connect}")
-    print(f"Data: {data}")
-    return 0
+    distances = []
+    for d1 in data:
+        for d2 in data:
+            if d1 < d2:
+                distances.append((math.dist(d1, d2), d1, d2))
+    distances.sort()
+
+    circuits = {}
+    members = {}
+    circuit_num = 0
+    for _dist, d1, d2 in distances[:num_connect]:
+        if d1 not in circuits and d2 not in circuits:
+            circuits[d1] = circuit_num
+            circuits[d2] = circuit_num
+            members[circuit_num] = {d1, d2}
+            circuit_num += 1
+        elif d1 not in circuits and d2 in circuits:
+            c = circuits[d2]
+            circuits[d1] = c
+            m = members[c] | {d1}
+            members[c] = m
+        elif d1 in circuits and d2 not in circuits:
+            c = circuits[d1]
+            circuits[d2] = c
+            m = members[c] | {d2}
+            members[c] = m
+        else:
+            # combine both sets to a new set
+            old_d1 = circuits[d1]
+            old_d2 = circuits[d2]
+            if old_d1 != old_d2:
+                m1 = members[old_d1]
+                m2 = members[old_d2]
+                m = m1 | m2
+                members[circuit_num] = m
+                del members[old_d1]
+                del members[old_d2]
+                for e in m:
+                    circuits[e] = circuit_num
+                circuit_num += 1
+
+    c = members.values()
+    c = list(map(len, c))
+    c.sort(reverse=True)
+    return c[0] * c[1] * c[2]
 
 
-def part2(data) -> int | str:
-    # TODO: implement Part 2
+def part2(data) -> int:
+    distances = []
+    for d1 in data:
+        for d2 in data:
+            if d1 < d2:
+                distances.append((math.dist(d1, d2), d1, d2))
+    distances.sort()
+
+    circuits = {}
+    members = {}
+    circuit_num = 0
+    for _dist, d1, d2 in distances:
+        if d1 not in circuits and d2 not in circuits:
+            circuits[d1] = circuit_num
+            circuits[d2] = circuit_num
+            members[circuit_num] = {d1, d2}
+            circuit_num += 1
+        elif d1 not in circuits and d2 in circuits:
+            c = circuits[d2]
+            circuits[d1] = c
+            m = members[c] | {d1}
+            members[c] = m
+        elif d1 in circuits and d2 not in circuits:
+            c = circuits[d1]
+            circuits[d2] = c
+            m = members[c] | {d2}
+            members[c] = m
+        else:
+            # combine both sets to a new set
+            old_d1 = circuits[d1]
+            old_d2 = circuits[d2]
+            if old_d1 != old_d2:
+                m1 = members[old_d1]
+                m2 = members[old_d2]
+                m = m1 | m2
+                members[circuit_num] = m
+                del members[old_d1]
+                del members[old_d2]
+                for e in m:
+                    circuits[e] = circuit_num
+                circuit_num += 1
+        if len(circuits) == len(data) and len(members) == 1:
+            x1, y1, z1 = d1
+            x2, y2, z2 = d2
+            return x1 * x2
+
     return 0
 
 
@@ -65,5 +151,5 @@ def test_example_part1():
 
 def test_example_part2():
     data = parse(_example_lines())
-    #assert part2(data) == 467835
+    assert part2(data) == 25272
 
