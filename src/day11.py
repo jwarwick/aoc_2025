@@ -31,21 +31,21 @@ def part1(outputs) -> int:
 
 def part2(outputs) -> int:
     count = 0
-    curr = [("svr", [])]
+    curr = [("svr", set())]
     while curr:
+        print(f"Curr len: {len(curr)}")
         next_curr = []
-        for c, path in curr:
+        for c, seen in curr:
             outs = outputs[c]
             if outs == ["out"]:
-                if "dac" in path and "fft" in path:
+                if "dac" in seen and "fft" in seen:
                     count += 1
             else:
                 for o in outs:
-                    if o not in path:
-                        next_curr.append((o, path + [o]))
+                    if o not in seen:
+                        next_curr.append((o, seen|{o}))
         curr = next_curr
     return count
-    return 0
 
 
 def solve(path: Path = INPUT_PATH) -> None:

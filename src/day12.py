@@ -5,12 +5,12 @@ INPUT_PATH = Path(__file__).with_suffix(".txt")
 
 def parse(lines: list[str]):
     """Turn raw input lines into a useful data structure."""
-    return [tuple(map(int, l.split(","))) for l in lines]
+    # TODO: customize for the puzzle
+    return lines
 
 
-def part1(num_connect, data) -> int:
-    print(f"Num to connect: {num_connect}")
-    print(f"Data: {data}")
+def part1(data) -> int | str:
+    # TODO: implement Part 1
     return 0
 
 
@@ -23,7 +23,7 @@ def solve(path: Path = INPUT_PATH) -> None:
     """Read input, solve both parts, print results."""
     lines = read_lines(path)
     data = parse(lines)
-    print("Part 1:", part1(1000, data))
+    print("Part 1:", part1(data))
     print("Part 2:", part2(data))
 
 
@@ -32,26 +32,10 @@ if __name__ == "__main__":
 
 
 EXAMPLE_INPUT = """\
-162,817,812
-57,618,57
-906,360,560
-592,479,940
-352,342,300
-466,668,158
-542,29,236
-431,825,988
-739,650,466
-52,470,668
-216,146,977
-819,987,18
-117,168,530
-805,96,715
-346,949,466
-970,615,88
-941,993,340
-862,61,35
-984,92,344
-425,690,689
+467..114..
+...*......
+..35..633.
+......#..#
 """
 
 def _example_lines() -> list[str]:
@@ -60,10 +44,12 @@ def _example_lines() -> list[str]:
 
 def test_example_part1():
     data = parse(_example_lines())
-    assert part1(10, data) == 40
+    # replace 4361 with the expected answer from the problem statement
+    assert part1(data) == 4361
 
 
 def test_example_part2():
     data = parse(_example_lines())
-    #assert part2(data) == 467835
+    # replace 467835 with the expected answer from the problem statement
+    assert part2(data) == 467835
 
