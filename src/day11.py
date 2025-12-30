@@ -1,5 +1,6 @@
 from pathlib import Path
 from helpers import read_lines 
+from functools import cache
 
 INPUT_PATH = Path(__file__).with_suffix(".txt")
 
@@ -13,6 +14,7 @@ def parse(lines: list[str]):
         outputs[start] = end
     return outputs
 
+global_outputs = {}
 
 def part1(outputs) -> int:
     count = 0
@@ -29,23 +31,25 @@ def part1(outputs) -> int:
     return count
 
 
+@cache
+def count_paths(start, end) -> int:
+    if start == end:
+        return 1
+    else:
+        return sum([count_paths(curr, end) for curr in global_outputs.get(start, [])])
+
 def part2(outputs) -> int:
-    count = 0
-    curr = [("svr", set())]
-    while curr:
-        print(f"Curr len: {len(curr)}")
-        next_curr = []
-        for c, seen in curr:
-            outs = outputs[c]
-            if outs == ["out"]:
-                if "dac" in seen and "fft" in seen:
-                    count += 1
-            else:
-                for o in outs:
-                    if o not in seen:
-                        next_curr.append((o, seen|{o}))
-        curr = next_curr
-    return count
+    global global_outputs
+    global_outputs = outputs
+    s_d = count_paths("svr", "dac")
+    d_f = count_paths("dac", "fft")
+    f_o = count_paths("fft", "out")
+    
+    s_f = count_paths("svr", "fft")
+    f_d = count_paths("fft", "dac")
+    d_o = count_paths("dac", "out")
+
+    return (s_d * d_f * f_o) + (s_f * f_d * d_o)
 
 
 def solve(path: Path = INPUT_PATH) -> None:
