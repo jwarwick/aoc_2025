@@ -30,37 +30,17 @@ def part1(data) -> int:
 def part2(data) -> int:
     ranges, _vals = data
     ranges = sorted(ranges, key=lambda v: v.start)
-    print(f"Ranges: {ranges}")
     blocks = [(ranges[0].start, ranges[0].stop-1)]
     for r in ranges[1:]:
-        idx_to_mod = -1
-        new_start = -1
-        new_stop = -1
+        last_start, last_stop = blocks[-1]
         r_start = r.start
         r_stop = r.stop-1
-        print(f"Blocks: {blocks}")
-        for idx, (start, stop) in enumerate(blocks):
-            print(f"Considering block {idx}: {start}, {stop}")
-            if r_start >= start and r_stop <= stop:
-                print(f"Contained, dropping")
-                break
-            elif r_start <= stop:
-                print(f"Extending: {start}, {r_stop}")
-                idx_to_mod = idx
-                new_start = start
-                new_stop = r_stop
-            else:
-                idx_to_mod = len(blocks)
-                print(f"Appending: {idx_to_mod}: {r_start}, {r_stop}")
-                new_start = r_start
-                new_stop = r_stop
-        if idx_to_mod > -1:
-            if idx_to_mod >= len(blocks):
-                blocks.append((0,0))
-            blocks[idx_to_mod] = (new_start, new_stop)
-            print(f"updated blocks: {blocks}")
-
-    print(f"Blocks: {blocks}")
+        if r_stop <= last_stop:
+            continue
+        elif r_start > last_stop:
+            blocks.append((r_start, r_stop))
+        else:
+            blocks[-1] = (last_start, r_stop)
     return sum(map(lambda x: (x[1]-x[0])+1, blocks))
 
 
