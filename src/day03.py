@@ -18,6 +18,21 @@ def compute_joltage(l) -> int:
     return curr_max
 
 
+def compute_joltage_part2(l) -> int:
+    result = ""
+    start_idx = 0
+    digits_left = 12
+    while digits_left > 0:
+        stop_idx = (len(l) - digits_left) + 1
+        s = l[start_idx:stop_idx]
+        m = max(s)
+        idx = s.index(m)
+        start_idx += idx + 1
+        digits_left -= 1
+        result += m
+    return int(result)
+
+
 def part1(data) -> int:
     total = 0
     for d in data:
@@ -26,7 +41,10 @@ def part1(data) -> int:
 
 
 def part2(data) -> int | str:
-    # TODO: implement Part 2
+    total = 0
+    for d in data:
+        total += compute_joltage_part2(d)
+    return total
     return 0
 
 
