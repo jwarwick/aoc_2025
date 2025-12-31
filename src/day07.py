@@ -1,5 +1,6 @@
 from pathlib import Path
 from helpers import read_lines 
+from collections import defaultdict
 
 INPUT_PATH = Path(__file__).with_suffix(".txt")
 
@@ -36,7 +37,22 @@ def part1(data) -> int:
 
 
 def part2(data) -> int:
-    return 0
+    start, splitters, manifold_end = data
+    x, _y = start
+    tachyons = {x: 1}
+    for y in range(manifold_end):
+        new_tachyons = defaultdict(int)
+        for x in tachyons.keys():
+            cnt = tachyons[x]
+            new_pos = (x, y+1)
+            if new_pos in splitters:
+                new_tachyons[x-1] += cnt
+                new_tachyons[x+1] += cnt
+            else:
+                new_tachyons[x] += cnt
+        tachyons = new_tachyons
+    total = sum(tachyons.values())
+    return total
 
 
 def solve(path: Path = INPUT_PATH) -> None:
