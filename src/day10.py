@@ -1,5 +1,6 @@
 from pathlib import Path
 from helpers import read_lines 
+import z3
 
 INPUT_PATH = Path(__file__).with_suffix(".txt")
 
@@ -45,6 +46,38 @@ def part1_one(d):
     return steps
 
 
+def part2_one(data):
+    _lights, button_data, joltage_data = data
+    num_buttons = len(joltage_data)
+
+    buttons = []
+    for b in button_data:
+        button = [0] * len(joltage_data)
+        for idx in list(b):
+            button[idx] = 1
+        buttons.append(button)
+
+    button_presses = [z3.Int(f"b_{i}") for i in range(len(button_data))]
+    opt = z3.Optimize()
+    for x in button_presses:
+        opt.add(x >= 0)
+
+    num_joltage = len(joltage_data)
+    num_buttons = len(buttons)
+    for j in range(num_joltage):
+        opt.add(z3.Sum(buttons[b][j] * button_presses[b] for b in range(num_buttons)) == joltage_data[j])
+
+    obj = z3.Sum(button_presses)
+    opt.minimize(obj)
+
+    if opt.check() != z3.sat:
+        print(f"FAILED TO SATISFY")
+        return 0
+
+    model = opt.model()
+    total_presses =  sum([model.evaluate(x).as_long() for x in button_presses])
+    return total_presses
+
 
 def part1(data) -> int:
     total = 0
@@ -54,8 +87,10 @@ def part1(data) -> int:
 
 
 def part2(data) -> int:
-    print(f"Data: {data}")
-    return 0
+    total = 0
+    for d in data:
+        total += part2_one(d)
+    return total
 
 
 def solve(path: Path = INPUT_PATH) -> None:
