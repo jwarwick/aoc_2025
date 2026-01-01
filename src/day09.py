@@ -1,14 +1,16 @@
 from pathlib import Path
 from helpers import read_lines 
+from shapely import Polygon
+from shapely.geometry import box
 
 INPUT_PATH = Path(__file__).with_suffix(".txt")
 
 def parse(lines: list[str]):
     """Turn raw input lines into a useful data structure."""
-    points = set()
+    points = []
     for l in lines:
         vals = l.split(",")
-        points.add((int(vals[0]), int(vals[1])))
+        points.append((int(vals[0]), int(vals[1])))
     return points
 
 def area(p1, p2):
@@ -30,7 +32,20 @@ def part1(data) -> int:
 
 
 def part2(data) -> int:
-    return 0
+    big = Polygon(data)
+    best_area = 0
+    for p1 in data:
+        for p2 in data:
+            p1x, p1y = p1
+            p2x, p2y = p2
+            rect = box(min(p1x, p2x),
+                    min(p1y, p2y),
+                    max(p1x, p2x),
+                    max(p1y, p2y))
+            a = area(p1, p2)
+            if big.covers(rect) and a > best_area:
+                best_area = a
+    return best_area
 
 
 def solve(path: Path = INPUT_PATH) -> None:
